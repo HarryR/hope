@@ -203,9 +203,9 @@ obj_t *knl_get( knl_t *knl, const char *name )
 
 void knl_del( knl_t *knl, obj_t *cmd )
 {
-	knl_lock(knl);
+	obj_free(cmd, knl);
 
-		obj_free(cmd, knl);
+	knl_lock(knl);
 
 		knl->cmds = obj_unlink(knl->cmds, cmd);
 

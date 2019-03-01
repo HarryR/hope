@@ -39,16 +39,25 @@ void lck_rel(lck_t x)
 		ReleaseMutex(x);
 }
 
+
 // WIN32
-#elif defined(__linux__) || defined(__APPLE__)
+#else
 
 #include <stdlib.h>
 #include <pthread.h>
 
+
 lck_t lck_new()
 {
+	pthread_mutexattr_t attr;
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+
 	pthread_mutex_t *mtx = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
-	pthread_mutex_init(mtx, NULL);
+	pthread_mutex_init(mtx, &attr);
+
+	pthread_mutexattr_destroy(&attr);
+
 	return (lck_t)mtx;
 }
 
@@ -75,10 +84,10 @@ void lck_rel(lck_t x)
 	pthread_mutex_unlock(mtx);
 }
 
-// __linux__
+
+// non-win32
 #endif
 
 
 // LCK_C
 #endif
-
